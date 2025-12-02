@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>قطاع أبها</title>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- سكربت الواجهة المشترك -->
+  <script defer src="/static/app.js"></script>
+
+  <style>
+    :root {
+      --body-bg: #F2E7DE;
+      --panel-bg: #E5CFBD;
+      --text-dark: #392015;
+      --delta-pos: #1c7c3c;
+      --delta-neg: #b3261e;
+      --delta-neutral: #555555;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--body-bg);
+      font-family: "Tajawal", sans-serif;
+      direction: rtl;
+    }
+
+    .page-wrapper {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 24px 0;
+    }
+
+    .panel {
+      width: 1161px;
+      min-height: 1024px;
+      background: var(--panel-bg);
+      padding: 24px 32px 32px 32px;
+      position: relative;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    }
+
+    /* اللوقو أعلى يمين */
+    .header-bar {
+      position: absolute;
+      top: 24px;
+      right: 32px;
+    }
+
+    #logo-img {
+      width: 180px;
+      height: auto;
+      display: block;
+    }
+
+    /* زر القائمة */
+    #menu-btn {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      font-size: 26px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-dark);
+      z-index: 1001;
+    }
+
+    /* القائمة الجانبية */
+    #side-menu {
+      position: fixed;
+      top: 0;
+      left: -260px;
+      width: 260px;
+      height: 100%;
+      background: #E5CFBD;
+      padding: 40px 20px;
+      box-shadow: 4px 0 14px rgba(0,0,0,0.25);
+      transition: left 0.3s ease;
+      z-index: 1000;
+    }
+    #side-menu.open {
+      left: 0;
+    }
+    #side-menu ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    #side-menu li {
+      margin: 18px 0;
+      font-size: 18px;
+      color: var(--text-dark);
+      cursor: pointer;
+    }
+    #side-menu li:hover {
+      text-decoration: underline;
+    }
+
+    /* البطاقات */
+    .stats-row {
+      margin-top: 130px; /* أعلى شوي لأن عندنا عنوان القطاع */
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      width: 215.81px;
+      height: 115.22px;
+      background: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 12px 16px;
+      color: var(--text-dark);
+    }
+
+    .stat-main {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 600;
+    }
+
+    .stat-delta {
+      font-size: 12px;
+    }
+
+    .delta-positive {
+      color: var(--delta-pos);
+    }
+
+    .delta-negative {
+      color: var(--delta-neg);
+    }
+
+    .delta-neutral {
+      color: var(--delta-neutral);
+    }
+
+    .stat-label {
+      font-size: 13px;
+      font-weight: 400;
+    }
+
+    /* الرسم البياني */
+    .chart-section {
+  background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+  border-radius: 24px;
+  box-shadow: var(--shadow-lg);
+  padding: 24px;                     /* كان 40px */
+  border: 1px solid rgba(196, 167, 125, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.chart-box {
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 16px;
+  padding: 16px;                     /* كان 24px */
+  min-height: 360px;                 /* كان 550px */
+  max-height: 400px;                 /* حد أقصى معقول */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  border: 1px solid rgba(196, 167, 125, 0.15);
+}
+
+#visitsChart {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 360px;                 /* أصغر من قبل */
+}
+
+    #status {
+      margin-top: 12px;
+      font-size: 12px;
+      color: #555;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<!-- مهم: data-sector="abha" عشان يستدعي API القطاع -->
+<body data-sector="abha">
+
+  <!-- القائمة الجانبية -->
+  <div id="side-menu">
+    <ul>
+      <li onclick="navigateTo('home')">الرئيسية</li>
+      <li onclick="navigateTo('abha')">قطاع أبها</li>
+      <li onclick="navigateTo('khamis')">قطاع الخميس</li>
+      <li onclick="navigateTo('north')">قطاع الشمال</li>
+      <li onclick="navigateTo('south')">قطاع الجنوب</li>
+      <li onclick="navigateTo('west')">قطاع الغرب</li>
+      <li onclick="navigateTo('upload')">رفع الملفات</li>
+    </ul>
+  </div>
+
+  <div class="page-wrapper">
+    <div class="panel">
+
+      <!-- زر القائمة -->
+      <button id="menu-btn">☰</button>
+
+      <!-- اللوقو -->
+      <div class="header-bar">
+        <img id="logo-img" src="/static/Aseer logo - dark .png" alt="Aseer Municipality Logo">
+      </div>
+
+      <!-- عنوان القطاع -->
+      <div style="margin-top:90px;margin-right:10px;font-size:18px;color:#392015;">
+        مؤشرات قطاع أبها
+      </div>
+
+      <!-- البطاقات -->
+      <div class="stats-row">
+
+        <!-- لم تُزر -->
+        <div class="stat-card">
+          <div class="stat-main">
+            <div class="stat-value" id="card-not-visited-value">0</div>
+            <div class="stat-delta delta-neutral" id="card-not-visited-delta">
+              لا يوجد يوم سابق
+            </div>
+          </div>
+          <div class="stat-label">لم تُزر</div>
+        </div>
+
+        <!-- تمت زيارتها -->
+        <div class="stat-card">
+          <div class="stat-main">
+            <div class="stat-value" id="card-visited-value">0</div>
+            <div class="stat-delta delta-neutral" id="card-visited-delta">
+              لا يوجد يوم سابق
+            </div>
+          </div>
+          <div class="stat-label">تمت زيارتها</div>
+        </div>
+
+        <!-- إجمالي عدد الزيارات -->
+        <div class="stat-card">
+          <div class="stat-main">
+            <div class="stat-value" id="card-total-value">0</div>
+            <div class="stat-delta delta-neutral" id="card-total-delta">
+              لا يوجد يوم سابق
+            </div>
+          </div>
+          <div class="stat-label">إجمالي عدد الزيارات</div>
+        </div>
+
+      </div>
+
+      <!-- الرسم البياني -->
+      <div class="chart-box">
+        <canvas id="visitsChart" width="794" height="501"></canvas>
+      </div>
+
+      <div id="status"></div>
+
+    </div>
+  </div>
+</body>
+</html>
