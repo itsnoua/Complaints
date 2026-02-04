@@ -4,140 +4,172 @@
   <meta charset="UTF-8" />
   <title>رفع الملفات</title>
 
+  <!-- سكربت الواجهة (لرفع الملفات) -->
   <script defer src="/static/app.js"></script>
 
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
+
     :root {
       --body-bg: #F2E7DE;
       --panel-bg: #E5CFBD;
       --text-dark: #392015;
+      --accent-gold: #C4A77D;
+      --shadow-sm: 0 2px 8px rgba(57, 32, 21, 0.08);
+      --shadow-md: 0 4px 16px rgba(57, 32, 21, 0.12);
+      --shadow-lg: 0 8px 32px rgba(57, 32, 21, 0.16);
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       margin: 0;
-      background: var(--body-bg);
+      background: #F2E7DE;
       font-family: "Tajawal", sans-serif;
       direction: rtl;
+      min-height: 100vh;
     }
 
     .page-wrapper {
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      padding: 24px 0;
+      padding: 40px 20px;
     }
 
     .panel {
-      width: 1161px;
-      min-height: 600px;
+      width: 100%;
+      max-width: 1200px;
+      min-height: 700px;
       background: var(--panel-bg);
-      padding: 24px 32px 32px 32px;
+      padding: 32px 40px;
       position: relative;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+      box-shadow: var(--shadow-lg);
+      border-radius: 20px;
     }
 
-    /* اللوقو أعلى يمين مثل الرئيسية */
+    /* الهيدر (اللوقو) */
     .header-bar {
-      position: absolute;
-      top: 24px;
-      right: 32px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(57, 32, 21, 0.15);
     }
+
     #logo-img {
-      width: 180px;
+      width: 220px;
       height: auto;
       display: block;
     }
 
-    /* زر القائمة يسار */
-    #menu-btn {
-      position: absolute;
-      top: 24px;
-      left: 24px;
-      font-size: 26px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--text-dark);
-      z-index: 1001;
+    /* تخطيط عام: قائمة يمين + محتوى يسار */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 24px;
     }
 
-    /* القائمة الجانبية نفسها */
-    #side-menu {
-      position: fixed;
-      top: 0;
-      left: -260px;
-      width: 260px;
+    /* القائمة الجانبية */
+    .side-menu {
+      background: #E0C8B4;
+      border-radius: 16px;
+      padding: 16px 14px;
+      box-shadow: var(--shadow-sm);
       height: 100%;
-      background: #E5CFBD;
-      padding: 40px 20px;
-      box-shadow: 4px 0 14px rgba(0,0,0,0.25);
-      transition: left 0.3s ease;
-      z-index: 1000;
     }
-    #side-menu.open {
-      left: 0;
+
+    .side-menu-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 10px;
     }
-    #side-menu ul {
+
+    .side-menu ul {
       list-style: none;
-      margin: 0;
-      padding: 0;
     }
-    #side-menu li {
-      margin: 18px 0;
-      font-size: 18px;
+
+    .side-menu li {
+      margin-bottom: 8px;
+      padding: 10px 12px;
+      font-size: 15px;
+      font-weight: 600;
       color: var(--text-dark);
       cursor: pointer;
+      border-radius: 10px;
+      transition: background 0.2s, transform 0.1s;
     }
-    #side-menu li:hover {
-      text-decoration: underline;
+
+    .side-menu li:hover {
+      background: rgba(255,255,255,0.7);
+      transform: translateY(-1px);
+    }
+
+    /* محتوى الصفحة */
+    .content-area {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
     }
 
     /* صندوق رفع الملفات */
     .upload-box {
-      margin-top: 120px;
-      background: #ffffffcc;
+      background: #ffffff;
       border-radius: 16px;
       padding: 24px 28px;
-      max-width: 700px;
-      margin-right: auto;
-      margin-left: auto;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      box-shadow: var(--shadow-md);
       color: var(--text-dark);
+      border: 1px solid rgba(196, 167, 125, 0.5);
+      max-width: 700px;
     }
 
     .upload-box h1 {
-      margin: 0 0 16px 0;
+      margin: 0 0 12px 0;
       font-size: 22px;
+      font-weight: 800;
+    }
+
+    .upload-box p {
+      font-size: 13px;
+      margin-bottom: 16px;
+      color: #4f3a2b;
     }
 
     .upload-field {
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       font-size: 14px;
     }
 
     .upload-field label {
       display: inline-block;
-      margin-left: 6px;
+      margin-bottom: 4px;
+      font-weight: 600;
     }
 
     input[type="file"] {
       font-size: 13px;
     }
 
-    button {
+    button[type="submit"] {
       margin-top: 8px;
-      padding: 8px 16px;
-      border-radius: 8px;
-      border: 1px solid #b89b7e;
+      padding: 8px 18px;
+      border-radius: 10px;
+      border: 1px solid var(--accent-gold);
       background: #f6e8d9;
       color: var(--text-dark);
       cursor: pointer;
       font-size: 14px;
+      font-weight: 600;
+      box-shadow: var(--shadow-sm);
     }
 
-    button:hover {
+    button[type="submit"]:hover {
       background: #f0ddc7;
     }
 
@@ -146,64 +178,88 @@
       font-size: 13px;
       color: #555;
     }
+
+    @media (max-width: 900px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+      }
+      .side-menu {
+        order: -1;
+        margin-bottom: 16px;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <!-- القائمة الجانبية -->
-  <div id="side-menu">
-    <ul>
-      <li onclick="navigateTo('home')">الرئيسية</li>
-      <li onclick="navigateTo('abha')">قطاع أبها</li>
-      <li onclick="navigateTo('khamis')">قطاع الخميس</li>
-      <li onclick="navigateTo('north')">قطاع الشمال</li>
-      <li onclick="navigateTo('south')">قطاع الجنوب</li>
-      <li onclick="navigateTo('west')">قطاع الغرب</li>
-      <li onclick="navigateTo('upload')">رفع الملفات</li>
-    </ul>
-  </div>
-
   <div class="page-wrapper">
     <div class="panel">
 
-      <!-- زر القائمة -->
-      <button id="menu-btn">☰</button>
-
-      <!-- اللوقو -->
+      <!-- الهيدر / اللوقو -->
       <div class="header-bar">
         <img id="logo-img" src="/static/Aseer logo - dark .png" alt="Aseer Municipality Logo">
       </div>
 
-      <!-- محتوى رفع الملفات -->
-      <div class="upload-box">
-        <h1>رفع ملفات الزيارات</h1>
-        <p style="font-size:13px;margin-bottom:16px;">
-          اختر ملفات مكين والوزارة ثم اضغط تشغيل الأداة. ستُستخدم هذه البيانات في لوحة المؤشرات الرئيسية.
-        </p>
+      <!-- تخطيط عام: قائمة يمين + محتوى يسار -->
+      <div class="main-layout">
 
-        <form id="upload-form">
-          <div class="upload-field">
-            <label>ملف الزيارات (اليوم) – مكين:</label>
-            <input type="file" name="raw_today" accept=".xlsx" required />
+        <!-- القائمة الجانبية -->
+        <nav class="side-menu">
+          <div class="side-menu-title">التنقل</div>
+          <ul>
+            <li onclick="navigateTo('home')">الرئيسية</li>
+            <li onclick="navigateTo('abha')">قطاع أبها</li>
+            <li onclick="navigateTo('khamis')">قطاع الخميس</li>
+            <li onclick="navigateTo('north')">قطاع الشمال</li>
+            <li onclick="navigateTo('south')">قطاع الجنوب</li>
+            <li onclick="navigateTo('west')">قطاع الغرب</li>
+            <li onclick="navigateTo('upload')">رفع الملفات</li>
+          </ul>
+        </nav>
+
+        <!-- محتوى الصفحة -->
+        <div class="content-area">
+          <div class="upload-box">
+            <h1>رفع الملفات</h1>
+        
+            <form id="upload-form">
+              <div class="upload-field">
+                <label>الزيارات وحالاتها </label><br>
+                <input type="file" name="raw_today" accept=".xlsx" required />
+              </div>
+
+              <div class="upload-field">
+                <label>ملف الوزارة</label><br>
+                <input type="file" name="ministry_new" accept=".xlsx" required />
+              </div>
+
+              <!-- الحقل القديم لليوم السابق موجود فقط للتوافق، لكن غير مطلوب -->
+              <div class="upload-field">
+                <label>غير مطلوب حاليا </label><br>
+                <input type="file" name="raw_prev" accept=".xlsx" />
+              </div>
+
+              <button type="submit">تشغيل </button>
+            </form>
+
+            <div id="upload-status"></div>
           </div>
+        </div>
 
-          <div class="upload-field">
-            <label>ملف الزيارات (اليوم السابق) – مكين (اختياري):</label>
-            <input type="file" name="raw_prev" accept=".xlsx" />
-          </div>
-
-          <div class="upload-field">
-            <label>ملف الوزارة (Asir):</label>
-            <input type="file" name="ministry_new" accept=".xlsx" required />
-          </div>
-
-          <button type="submit">تشغيل الأداة</button>
-        </form>
-
-        <div id="upload-status"></div>
-      </div>
+      </div> <!-- /main-layout -->
 
     </div>
   </div>
+
+  <script>
+    // دالة التنقل بين الصفحات - نفس الرئيسية تماماً
+    function navigateTo(page) {
+      if (page === 'home') {
+        window.location.href = '/';
+      } else {
+        window.location.href = `/${page}.html`;
+      }
+    }
+  </script>
 </body>
 </html>

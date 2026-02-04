@@ -1,15 +1,10 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>لوحة المؤشرات</title>
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- سكربت الواجهة -->
-  <script defer src="/static/app.js"></script>
-
+  <title>تسجيل الدخول - الادارة العامة للامتثال</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
 
@@ -17,663 +12,200 @@
       --body-bg: #F2E7DE;
       --panel-bg: #E5CFBD;
       --text-dark: #392015;
-      --delta-pos: #1c7c3c;
-      --delta-neg: #b3261e;
-      --delta-neutral: #555555;
       --accent-gold: #C4A77D;
-      --shadow-sm: 0 2px 8px rgba(57, 32, 21, 0.08);
-      --shadow-md: 0 4px 16px rgba(57, 32, 21, 0.12);
       --shadow-lg: 0 8px 32px rgba(57, 32, 21, 0.16);
     }
 
-    * { 
-      box-sizing: border-box;
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
 
     body {
-      margin: 0;
-      background: linear-gradient(135deg, #F2E7DE 0%, #E8DDD3 100%);
+      background: linear-gradient(135deg, #F2E7DE, #E8D5C4);
       font-family: "Tajawal", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       direction: rtl;
-      min-height: 100vh;
+      color: var(--text-dark);
     }
 
-    .page-wrapper {
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      padding: 40px 20px;
-    }
-
-    .panel {
+    .login-wrapper {
       width: 100%;
-      max-width: 1200px;
-      min-height: 1024px;
+      max-width: 400px;
+      padding: 20px;
+    }
+
+    .login-panel {
       background: var(--panel-bg);
-      padding: 40px 48px;
-      position: relative;
-      box-shadow: var(--shadow-lg);
-      border-radius: 24px;
-      backdrop-filter: blur(10px);
-    }
-
-    /* اللوقو والهيدر */
-    .header-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 48px;
-      padding-bottom: 24px;
-      border-bottom: 2px solid rgba(57, 32, 21, 0.1);
-    }
-
-    #logo-img {
-      width: 220px;
-      height: auto;
-      display: block;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-    }
-
-    .header-title {
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--text-dark);
-      letter-spacing: -0.5px;
-    }
-
-    /* زر القائمة */
-    #menu-btn {
-      position: absolute;
-      top: 40px;
-      left: 48px;
-      font-size: 24px;
-      background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
-      border: none;
-      cursor: pointer;
-      color: var(--text-dark);
-      z-index: 1001;
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: var(--shadow-sm);
-    }
-
-    #menu-btn:hover {
-      background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
-      box-shadow: var(--shadow-md);
-      transform: scale(1.05);
-    }
-
-    #menu-btn:active {
-      transform: scale(0.95);
-    }
-
-    /* القائمة الجانبية */
-    #side-menu {
-  position: fixed;
-  top: 0;
-  right: -320px;              /* ⬅ بدّلنا من left إلى right */
-  left: auto;                 /* تأكد أنه ما فيه left */
-  width: 320px;
-  height: 100%;
-  background: linear-gradient(180deg, #E5CFBD 0%, #D9C4B0 100%);
-  padding: 80px 32px 40px 32px;
-  box-shadow: -8px 0 32px rgba(0,0,0,0.25);  /* ظل من اليمين */
-  transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);  /* نحرّك right */
-  z-index: 1000;
-  overflow-y: auto;
-}
-
-#side-menu.open {
-  right: 0;                   /* ⬅ بدل ما يكون left:0 */
-}
-
-
-    #side-menu::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 60px;
-      background: linear-gradient(180deg, rgba(57, 32, 21, 0.05) 0%, transparent 100%);
-    }
-    
-    #side-menu ul {
-      list-style: none;
-    }
-    
-    #side-menu li {
-      margin: 0 0 8px 0;
-      padding: 16px 20px;
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--text-dark);
-      cursor: pointer;
-      border-radius: 12px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-    }
-
-    #side-menu li::before {
-      content: '';
-      position: absolute;
-      right: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 4px;
-      height: 0;
-      background: var(--accent-gold);
-      transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      border-radius: 2px;
-    }
-    
-    #side-menu li:hover {
-      background: rgba(255,255,255,0.6);
-      transform: translateX(-8px);
-      box-shadow: var(--shadow-sm);
-    }
-
-    #side-menu li:hover::before {
-      height: 60%;
-    }
-
-    /* البطاقات */
-    .stats-row {
-      margin-top: 0;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
-      margin-bottom: 48px;
-    }
-
-    .stat-card {
-      background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
-      border-radius: 20px;
-      box-shadow: var(--shadow-md);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 28px 24px;
-      color: var(--text-dark);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-      border: 1px solid rgba(196, 167, 125, 0.2);
-    }
-
-    .stat-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 100%;
-      height: 4px;
-      background: linear-gradient(90deg, var(--accent-gold) 0%, transparent 100%);
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-8px) scale(1.02);
-      box-shadow: var(--shadow-lg);
-      border-color: var(--accent-gold);
-    }
-
-    .stat-card:hover::before {
-      opacity: 1;
-    }
-
-    .stat-main {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .stat-value {
-      font-size: 42px;
-      font-weight: 800;
-      line-height: 1;
-      background: linear-gradient(135deg, var(--text-dark) 0%, #5a3a25 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .stat-delta {
-      font-size: 13px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .delta-positive { 
-      color: var(--delta-pos);
-    }
-    .delta-positive::before {
-      content: '↑';
-      font-size: 14px;
-    }
-    
-    .delta-negative { 
-      color: var(--delta-neg);
-    }
-    .delta-negative::before {
-      content: '↓';
-      font-size: 14px;
-    }
-    
-    .delta-neutral { 
-      color: var(--delta-neutral);
-    }
-
-    .stat-label {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-dark);
-      opacity: 0.7;
-      margin-top: 8px;
-    }
-
-    /* الفلاتر */
-    .filters-section {
-      background: linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.4) 100%);
-      border-radius: 20px;
-      padding: 32px;
-      margin-bottom: 32px;
-      box-shadow: var(--shadow-sm);
-      border: 1px solid rgba(196, 167, 125, 0.2);
-    }
-
-    .filters-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--text-dark);
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .filters-title::before {
-      content: '⚙';
-      font-size: 20px;
-    }
-
-    .filters-row {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 24px;
-    }
-
-    .filter {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .filter label {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-dark);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .filter label::before {
-      content: '●';
-      color: var(--accent-gold);
-      font-size: 8px;
-    }
-
-    .filter select {
-      padding: 14px 18px;
-      border-radius: 12px;
-      border: 2px solid rgba(196, 167, 125, 0.3);
-      font-family: "Tajawal", sans-serif;
-      font-size: 15px;
-      font-weight: 500;
-      background: #ffffff;
-      color: var(--text-dark);
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23392015' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: left 16px center;
-      padding-left: 40px;
-    }
-
-    .filter select:hover:not(:disabled) {
-      border-color: var(--accent-gold);
-      box-shadow: 0 4px 12px rgba(196, 167, 125, 0.2);
-      transform: translateY(-2px);
-    }
-
-    .filter select:focus {
-      outline: none;
-      border-color: var(--accent-gold);
-      box-shadow: 0 0 0 4px rgba(196, 167, 125, 0.15);
-    }
-
-    .filter select:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      background-color: #f5f5f5;
-    }
-
-    /* الرسم البياني */
-    .chart-section {
-      background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
-      border-radius: 24px;
-      box-shadow: var(--shadow-lg);
       padding: 40px;
-      border: 1px solid rgba(196, 167, 125, 0.2);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .chart-section::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 200px;
-      height: 200px;
-      background: radial-gradient(circle, rgba(196, 167, 125, 0.1) 0%, transparent 70%);
-      border-radius: 50%;
-      transform: translate(30%, -30%);
-    }
-
-    .chart-header {
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 32px;
-      position: relative;
-      z-index: 1;
+      flex-direction: column;
+      gap: 20px;
+      animation: scaleIn 0.5s ease;
     }
 
-    .chart-title {
-      font-size: 22px;
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .logo-img {
+      width: 180px;
+      margin: 0 auto;
+      display: block;
+    }
+
+    .login-title {
+      font-size: 20px;
       font-weight: 800;
       color: var(--text-dark);
+    }
+
+    .form-group {
+      text-align: right;
       display: flex;
-      align-items: center;
-      gap: 10px;
+      flex-direction: column;
+      gap: 5px;
     }
 
-    .chart-title::before {
-      content: '';
-      width: 4px;
-      height: 24px;
-      background: linear-gradient(180deg, var(--accent-gold) 0%, #8d7353 100%);
-      border-radius: 2px;
+    .form-group label {
+      font-weight: 600;
+      font-size: 14px;
     }
 
-    .chart-box {
-      background: rgba(255, 255, 255, 0.5);
-      border-radius: 16px;
-      padding: 24px;
-      min-height: 550px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      z-index: 1;
-      border: 1px solid rgba(196, 167, 125, 0.15);
+    .form-input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid rgba(57, 32, 21, 0.1);
+      border-radius: 10px;
+      font-family: "Tajawal", sans-serif;
+      outline: none;
+      transition: all 0.3s;
     }
 
-    #visitsChart {
-      display: block;
-      width: 100% !important;
-      height: 100% !important;
-      max-height: 500px;
+    .form-input:focus {
+      border-color: var(--accent-gold);
+      background: #fff;
     }
 
-    #status {
-      margin-top: 16px;
-      font-size: 13px;
-      color: #666;
-      text-align: center;
-      font-weight: 500;
-    }
-
-    .download-btn {
-      padding: 14px 32px;
-      border-radius: 14px;
-      border: 2px solid var(--accent-gold);
-      background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+    .login-btn {
+      margin-top: 10px;
+      padding: 12px;
+      background: var(--text-dark);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
       cursor: pointer;
       font-family: "Tajawal", sans-serif;
-      font-size: 15px;
-      font-weight: 700;
+      transition: transform 0.2s, background 0.3s;
+    }
+
+    .login-btn:hover {
+      background: var(--accent-gold);
+      transform: translateY(-2px);
       color: var(--text-dark);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: var(--shadow-sm);
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
     }
 
-    .download-btn::before {
-      content: '⬇';
-      font-size: 16px;
+    #error-msg {
+      color: #b3261e;
+      font-size: 13px;
+      font-weight: 600;
+      min-height: 20px;
     }
 
-    .download-btn:hover {
-      background: linear-gradient(135deg, var(--accent-gold) 0%, #b89b7e 100%);
-      color: #ffffff;
-      transform: translateY(-3px);
-      box-shadow: var(--shadow-md);
-      border-color: var(--accent-gold);
-    }
-
-    .download-btn:active {
-      transform: translateY(-1px);
-    }
-
-    #download-sector-container {
-      text-align: center;
-      margin-top: 32px;
-    }
-
-    /* Overlay للقائمة */
-    .menu-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(4px);
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-      z-index: 999;
-    }
-
-    .menu-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .panel {
-        padding: 24px;
-        border-radius: 16px;
-      }
-
-      .stats-row {
-        grid-template-columns: 1fr;
-      }
-
-      .filters-row {
-        grid-template-columns: 1fr;
-      }
-
-      #logo-img {
-        width: 160px;
-      }
-
-      .header-title {
-        font-size: 20px;
-      }
+    footer {
+      margin-top: 20px;
+      font-size: 12px;
+      opacity: 0.7;
     }
   </style>
 </head>
 
 <body>
-  <!-- Overlay -->
-  <div class="menu-overlay" id="menu-overlay"></div>
 
-  <!-- القائمة الجانبية -->
-  <div id="side-menu">
-    <ul>
-      <li onclick="navigateTo('home')">الرئيسية</li>
-      <li onclick="navigateTo('abha')">قطاع أبها</li>
-      <li onclick="navigateTo('khamis')">قطاع الخميس</li>
-      <li onclick="navigateTo('north')">قطاع الشمال</li>
-      <li onclick="navigateTo('south')">قطاع الجنوب</li>
-      <li onclick="navigateTo('west')">قطاع الغرب</li>
-      <li onclick="navigateTo('upload')">رفع الملفات</li>
-    </ul>
-  </div>
+  <div class="login-wrapper">
+    <div class="login-panel">
+      <img src="/static/Aseer logo - dark .png" alt="Aseer Logo" class="logo-img">
+      <h1 class="login-title">تسجيل الدخول</h1>
 
-  <div class="page-wrapper">
-    <div class="panel">
-
-      <!-- زر القائمة -->
-      <button id="menu-btn">☰</button>
-
-      <!-- اللوقو -->
-      <div class="header-bar">
-        <img id="logo-img" src="/static/Aseer logo - dark .png" alt="Aseer Municipality Logo">
-      </div>
-
-      <!-- البطاقات -->
-      <div class="stats-row">
-
-        <!-- لم تُزر -->
-        <div class="stat-card">
-          <div class="stat-main">
-            <div class="stat-value" id="card-not-visited-value">0</div>
-            <div class="stat-delta delta-neutral" id="card-not-visited-delta">
-              لا يوجد يوم سابق
-            </div>
-          </div>
-          <div class="stat-label">لم تُزر</div>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="username">اسم المستخدم</label>
+          <input type="text" id="username" class="form-input" required autofocus>
         </div>
 
-        <!-- تمت زيارتها -->
-        <div class="stat-card">
-          <div class="stat-main">
-            <div class="stat-value" id="card-visited-value">0</div>
-            <div class="stat-delta delta-neutral" id="card-visited-delta">
-              لا يوجد يوم سابق
-            </div>
-          </div>
-          <div class="stat-label">تمت زيارتها</div>
+        <div class="form-group">
+          <label for="password">كلمة المرور</label>
+          <input type="password" id="password" class="form-input" required>
         </div>
 
-        <!-- إجمالي عدد الزيارات -->
-        <div class="stat-card">
-          <div class="stat-main">
-            <div class="stat-value" id="card-total-value">0</div>
-            <div class="stat-delta delta-neutral" id="card-total-delta">
-              لا يوجد يوم سابق
-            </div>
-          </div>
-          <div class="stat-label">إجمالي عدد الزيارات</div>
-        </div>
+        <div id="error-msg"></div>
 
-      </div>
+        <button type="submit" class="login-btn">دخول</button>
+      </form>
 
-      <!-- الفلاتر -->
-      <div class="filters-section">
-        <div class="filters-title">الفلاتر والإعدادات</div>
-        <div class="filters-row">
-          <div class="filter">
-            <label for="sector-filter">القطاع</label>
-            <select id="sector-filter">
-              <option value="">كل القطاعات</option>
-            </select>
-          </div>
-
-          <div class="filter">
-            <label for="municipality-filter">البلدية</label>
-            <select id="municipality-filter" disabled>
-              <option value="">كل البلديات</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <!-- الرسم البياني -->
-      <div class="chart-section">
-        <div class="chart-header">
-          <div class="chart-title">تحليل الزيارات</div>
-        </div>
-        <div class="chart-box">
-          <canvas id="visitsChart"></canvas>
-        </div>
-      </div>
-
-      <!-- زر تحميل ملفات القطاع -->
-      <div id="download-sector-container" style="display:none;">
-        <button id="download-sector-btn" class="download-btn">
-          تحميل ملفات القطاع
-        </button>
-      </div>
-
-      <div id="status"></div>
-
+      <footer>الادارة العامة للامتثال</footer>
     </div>
   </div>
 
   <script>
-    // دالة التنقل بين الصفحات - FastAPI
-    function navigateTo(page) {
-      if (page === 'home') {
-        window.location.href = '/';
-      } else {
-        window.location.href = `/${page}`;
+    // Clean session on load
+    sessionStorage.removeItem("auth_creds");
+
+    const form = document.getElementById("login-form");
+    const errorMsg = document.getElementById("error-msg");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorMsg.textContent = "";
+
+      const user = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value.trim();
+
+      if (!user || !pass) return;
+
+      // Create Base64 Auth Header
+      const creds = "Basic " + btoa(user + ":" + pass);
+
+      try {
+        // Test credentials against a simple protected endpoint
+        // We'll use /api/login which we will add to main.py
+        const resp = await fetch("/api/login", {
+          method: "GET",
+          headers: {
+            "Authorization": creds
+          }
+        });
+
+        if (resp.ok) {
+          // Success
+          sessionStorage.setItem("auth_creds", creds);
+          window.location.href = "/dashboard.html";
+        } else {
+          errorMsg.textContent = "اسم المستخدم أو كلمة المرور غير صحيحة";
+        }
+      } catch (err) {
+        console.error(err);
+        errorMsg.textContent = "حدث خطأ في الاتصال";
       }
-    }
-
-    // تفعيل القائمة الجانبية
-    const menuBtn = document.getElementById('menu-btn');
-    const sideMenu = document.getElementById('side-menu');
-    const overlay = document.getElementById('menu-overlay');
-
-    menuBtn.addEventListener('click', () => {
-      sideMenu.classList.toggle('open');
-      overlay.classList.toggle('active');
-    });
-
-    overlay.addEventListener('click', () => {
-      sideMenu.classList.remove('open');
-      overlay.classList.remove('active');
-    });
-
-    // إغلاق القائمة عند الضغط على أي عنصر
-    document.querySelectorAll('#side-menu li').forEach(item => {
-      item.addEventListener('click', () => {
-        sideMenu.classList.remove('open');
-        overlay.classList.remove('active');
-      });
     });
   </script>
+
 </body>
+
 </html>
